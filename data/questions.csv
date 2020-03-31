@@ -1,0 +1,12 @@
+"Question text", "Created At", "Choice 1", "Choice", "Choice 3"
+"What is the capital of Luxembourg ?", "2019-06-01 00:00:00", "Luxembourg", "Paris", "Berlin"
+"What does mean O.A.T. ?", "2019-06-02 00:00:00", "Open Assignment Technologies", "Open Assessment Technologies", "Open Acknowledgment Technologies"
+Question text,Created At,Choice 1,Choice,Choice 3
+What is the capital of Luxembourg ?,2019-06-01 00:00:00,Luxembourg,Paris,Berlin
+What does mean O.A.T. ?,2019-06-02 00:00:00,Open Assignment Technologies,Open Assessment Technologies,Open Acknowledgment Technologies
+,2020-04-01 02:30:34,,,
+Question text,Created At,Choice 1,Choice,Choice 3
+What is the capital of Luxembourg ?,2019-06-01 00:00:00,Luxembourg,Paris,Berlin
+What does mean O.A.T. ?,2019-06-02 00:00:00,Open Assignment Technologies,Open Assessment Technologies,Open Acknowledgment Technologies
+,2020-04-01 02:30:34,,,
+test,2020-04-01 02:30:37,1,2,3

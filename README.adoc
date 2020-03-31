@@ -1,0 +1,206 @@
+== Exercise question
+
+It's RESTful cloud native and ready for docker application.
+
+To enable translate feature you should fill correct describe following environments:  `GOOGLE_APPLICATION_CREDENTIALS` and `GOOGLE_APPLICATION_PROJECT_ID`. Look beneath in current document for details.
+
+Without credentials application work without translation and return responses in `en-UE` language.
+
+=== development
+Application use `clean architecture` approach with `delivery`, `repository` and `usecase` layers. Implementation located on related folders.
+
+==== project structure
+.repository
+Folder contains repository layer.
+
+.data
+Folder used for source files. Also via docker storage could be added additional or new source files.
+
+.model
+Folder contain structure implementation both DTO. Internal repository models could be placed here for achieve power of tags.
+
+==== conventions
+===== opentracing
+everything should be covered by tracing approach. Look in interna/zlogtr
+
+===== graceful shutdown
+
+===== Docker
+Just example:
+[source]
+----
+$ docker build -f docker/Dockerfile . -t test
+----
+
+===== build flags
+
+* `unit` - internal tests
+
+Example:
+[source,go]
+----
+// +build unit
+----
+
+===== Environment
+
+.DELIVERY_HTTP_ADDR
+default: 8080
+
+.PROMETHEUS_HTTP_ADDR
+default: 8089
+
+.GOOGLE_APPLICATION_CREDENTIALS
+check out https://cloud.google.com/translate/docs/basic/setup-basic
+
+.GOOGLE_APPLICATION_PROJECT_ID
+google project id ref to credentials. Field  `project_id` from credential json file
+
+==== Development tools
+
+Mockery generate testify stuff for our mock tests.
+
+[source,bash]
+----
+$ GO111MODULE=off go get github.com/vektra/mockery/.../
+----
+
+Linter:
+
+[source,bash]
+----
+$ GO111MODULE=off go get -u github.com/golangci/golangci-lint/cmd/golangci-lint
+----
+
+go-swagger
+
+[source,bash]
+----
+$ GO111MODULE=off go get -u github.com/go-swagger/go-swagger/cmd/swagger
+----
+
+== Example:
+Load csv file
+[source,bash]
+----
+$ GOOGLE_APPLICATION_CREDENTIALS=langs-parser-208710-db57006bda82.json GOOGLE_APPLICATION_PROJECT_ID=langs-parser-208710 go run main.go -f questions.csv
+----
+
+or json
+
+[source,bash]
+----
+$ GOOGLE_APPLICATION_CREDENTIALS=langs-parser-208710-db57006bda82.json GOOGLE_APPLICATION_PROJECT_ID=langs-parser-208710 go run main.go -f questions.json
+----
+
+or default `questions.json` without explicit file flag (f)
+[source,bash]
+----
+$ GOOGLE_APPLICATION_CREDENTIALS=langs-parser-208710-db57006bda82.json GOOGLE_APPLICATION_PROJECT_ID=langs-parser-208710 go run main.go
+----
+
+== Tests
+=== json
+List request:
+[source,bash]
+----
+curl -H"Content-Type: application/json" -X GET http://127.0.0.1:8080/questions\?lang\=ru
+----
+Response:
+[source,json]
+----
+[{"text":"Какая столица в Люксембурге?","createdAt":"2019-06-01 00:00:00","choices":[{"text":"Люксембург"},{"text":"Париж"},{"text":"Берлин"}]},{"text":"Что значит О.А.Т. ?","createdAt":"2019-06-02 00:00:00","choices":[{"text":"Технологии Открытого Назначения"},{"text":"Технологии открытой оценки"},{"text":"Открытые технологии признания"}]}]
+----
+
+Create request:
+[source,bash]
+----
+curl -X POST \
+  http://127.0.0.1:8080/questions \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/json' \
+  -d '{
+        "text": "test",
+        "choices": [
+            {
+                "text": "1"
+            },
+            {
+                "text": "2"
+            },
+            {
+                "text": "3"
+            }
+        ]
+}'
+----
+Response:
+[source,json]
+----
+{"text":"test","createdAt":"2020-04-01 02:30:37","choices":[{"text":"1"},{"text":"2"},{"text":"3"}]}
+----
+
+=== xml
+List request:
+[source,bash]
+----
+curl -H"Content-Type: application/xml" -X GET http://127.0.0.1:8080/questions\?lang\=ru
+----
+Response:
+[source,xml]
+----
+<Question><Text>Какая столица в Люксембурге?</Text><CreatedAt>2019-06-01 00:00:00</CreatedAt><Choices><Text>Люксембург</Text></Choices><Choices><Text>Париж</Text></Choices><Choices><Text>Берлин</Text></Choices></Question><Question><Text>Что значит О.А.Т. ?</Text><CreatedAt>2019-06-02 00:00:00</CreatedAt><Choices><Text>Технологии Открытого Назначения</Text></Choices><Choices><Text>Технологии открытой оценки</Text></Choices><Choices><Text>Открытые технологии признания</Text></Choices></Question>%
+----
+
+Create request:
+[source,bash]
+----
+curl -X POST \
+  http://127.0.0.1:8080/questions \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: application/xml' \
+  -d '<Question>
+    <Text>test</Text>
+    <Choices>
+        <Text>1</Text>
+    </Choices>
+    <Choices>
+        <Text>2</Text>
+    </Choices>
+    <Choices>
+        <Text>3</Text>
+    </Choices>
+</Question>'
+----
+
+Response:
+
+WARNING: issue in golang xml  decoder library. Required investigation. Moreover: xml library not support map structures => errors not shown in xml content-type also.
+
+
+== Feature
+* [*] Configuration via os environment + `.env` conventional approach
+* [*] Graceful shutdown implemented
+* [*] Clean architecture. Everything is mockable.
+* [*] Prometheus default service scrapping
+* [*] Cloud native logging approach via zerolog package
+* [*] Open tracing ready via Jaeger
+* [*] Recovery pattern for delivery layer via middle ware
+* [*] Health pattern for delivery. GET `/health`
+* [*] CORS for delivery.
+* [*] Delivery support `Content-Type` convention request/response with support `application/xml` and `application/json` and with simply posibility to amplify.
+* [*] Because represented model for csv and json not backported i performed approach how should it be handled. But i don't respect that approaches and recommend before doing that to do review by architector. `repository.filerpo` and relations with `repository.filerepo.repocsv` and `repository.filerepo.repojson`
+* [*] Conventional CLI with help
+* [*] Read JSON/CSV file via CLI flag with.
+* [*] Cloud storage ready. Folder `data` is flexible for on-live update  with docker volumes technology. You can easily create release with other initial files and use them on different NS stages of your application.
+* [*] Cache and Translation services as repository interfaces.
+* [*] Cache service with Translate are smart. Translate setive retrieve from google API only questions not in cache.
+* [ ] Resiliency pattern: circuit-breaker for translate api protection.
+* [*] Interfaces ready for Mockery generation.
+* [ ] Unit test with mock support.
+* [*] Docker file inside `docker` folder
+* [ ] Time field with support of json/csv marhaller and specified time format.
+* [*] Pattern secrets - everything important contains only inside env. `GOOGLE_APPLICATION_CREDENTIALS` and `GOOGLE_APPLICATION_PROJECT_ID`
+* [*] Google Translate API. Auth via credential file.
+* [*] Linter verified
+* [*] Golang 1.14.1 ready with mod power
