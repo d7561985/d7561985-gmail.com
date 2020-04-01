@@ -75,8 +75,7 @@ func run(ctx *cli.Context) error {
 
 	trnsl, err := translate.New(os.Getenv("GOOGLE_APPLICATION_PROJECT_ID"), trace, ucTimeOut)
 	if err != nil {
-		logger.LogFields(zerolog.FatalLevel, log.Error(err))
-		return err
+		logger.LogFields(zerolog.InfoLevel, log.Error(err))
 	}
 
 	uc := simple.NewService(repo, trnsl, memcache.New(), logger, ucTimeOut)
