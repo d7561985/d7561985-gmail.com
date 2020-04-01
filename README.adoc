@@ -29,8 +29,11 @@ everything should be covered by tracing approach. Look in interna/zlogtr
 Just example:
 [source]
 ----
-$ docker build -f docker/Dockerfile . -t test
+$ make dockerrun
 ----
+
+====== volumes
+application use folder `/data` in container. So that dir should be used for link
 
 ===== build flags
 
