@@ -19,3 +19,6 @@ comp:
 
 mdocker:
 	docker build -f docker/Dockerfile . -t test
+
+dockerrun:
+	docker run -p 8080:8080 test
