@@ -1,3 +1,7 @@
+[#img]
+[link=https://pkg.go.dev/github.com/d7561985/questions?tab=overview]
+image::https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square[]
+
 == Exercise question
 
 It's RESTful cloud native and ready for docker application.
